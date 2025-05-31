@@ -1,13 +1,30 @@
 name: Skims Standalone CLI
+
 on: [push, pull_request]
 
 jobs:
   machineStandalone:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
-      - name: Run Fluid Attacks Skims
+      - name: Run Fluid Attacks Skims with config file
         run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan ./config.yaml
+          docker run --rm -v "${{ github.workspace }}:/my-dir" -w /my-dir fluidattacks/skims:latest skims scan
+
+      - name: Commit and push CSV report
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -f Fluid-Attacks-Results.csv ]; then
+            git add Fluid-Attacks-Results.csv
+            git commit -m "chore: update Fluid-Attacks-Results.csv [skip ci]" || echo "No changes to commit"
+            git push
+          else
+            echo "❌ CSV file not found in ${{ github.workspace }}"
+          fi
