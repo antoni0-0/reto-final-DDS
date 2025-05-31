@@ -10,7 +10,4 @@ jobs:
 
       - name: Run Fluid Attacks Skims
         run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims --strict scan /my-dir
-          
-      - name: Upload Skims output
-        run: docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan /my-dir > skims-output.txt
+          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims --strict scan /my-dir > skims-output.txt
