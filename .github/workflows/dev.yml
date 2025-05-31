@@ -1,16 +1,11 @@
-name: Skims Standalone CLI
+name: Standalone CLI
 on: [push, pull_request]
-
 jobs:
   machineStandalone:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run Fluid Attacks Skims
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan /my-dir || {
-            echo "❌ Skims found vulnerabilities or failed during analysis"
-            exit 1
-          }
+      - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
+      - uses: docker://docker.io/fluidattacks/skims:latest
+        name: skimsStandalone
+        with:
+          args: skims scan ${{ github.workspace }}
