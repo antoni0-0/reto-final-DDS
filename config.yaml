@@ -1,3 +1,4 @@
 tracing_opt_out: true
 strict: true
-output: /my-dir/skims-output.txt
+output:
+  file_path: /my-dir/skims-output.txt
