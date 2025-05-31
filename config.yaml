@@ -1,6 +1,5 @@
 tracing_opt_out: true
 strict: true
 output:
-  file_path: ./Fluid-Attacks-Results.csv
-  format: CSV
-working_dir: .
+  file_path: /my-dir/skims-output.csv
+  format: csv
