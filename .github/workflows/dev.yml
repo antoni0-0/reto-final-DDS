@@ -8,4 +8,4 @@ jobs:
       - uses: docker://docker.io/fluidattacks/skims:latest
         name: skimsStandalone
         with:
-          args: skims scan ${PWD}
+          args: skims scan https://github.com/antoni0-0/reto-final-DDS.git
