@@ -12,8 +12,7 @@ jobs:
 
       - name: Run Fluid Attacks Skims with config file
         run: |
-          docker run --rm -v "${{ github.workspace }}:/my-dir" \
-            fluidattacks/skims:latest skims scan config.yaml
+          docker run --rm -v "${{ github.workspace }}:/my-dir" fluidattacks/skims:latest skims scan config.yaml
         working-directory: ${{ github.workspace }}
       - name: Commit and push CSV report
         run: |
