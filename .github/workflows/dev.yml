@@ -17,3 +17,4 @@ jobs:
           path: |
             Fluid-Attacks-Results.csv
             **/*.csv
+          retention-days: 30
