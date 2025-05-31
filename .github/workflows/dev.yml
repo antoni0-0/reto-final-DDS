@@ -10,7 +10,8 @@ jobs:
 
       - name: Run Fluid Attacks Skims
         run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims --strict scan /my-dir > skims-output.txt
+          sudo docker run --rm -v "${{github.workspace}}:/my-dir" fluidattacks/skims:latest \
+          sh -c "skims --strict scan /my-dir > /my-dir/skims-output.txt"
       - name: Commit skims-output.txt
         run: |
           git config --global user.name "github-actions[bot]"

@@ -1,0 +1,917 @@
+[INFO] Official documentation: https://help.fluidattacks.com/portal/en/kb/find-security-vulnerabilities/use-the-cli
+[WARNING] Although skims does not collect any sensitive information, if you do not want to send any data to our servers, set the `tracing_opt_out` key to `True` in your configuration file
+[INFO] Scan started at 2025-05-31 15:29:49 (UTC+00:00)
+[INFO] Namespace: my-dir
+[WARNING] Unable to find commit HEAD on analyzed directory
+[INFO] Startup directory is: /src
+[INFO] Moving working dir to: /my-dir
+[INFO] Starting SAST analysis
+[INFO] Performing basic SAST analysis on 5 paths
+[INFO] Basic SAST analysis completed!
+[INFO] Performing advanced SAST analysis on 50 paths
+[INFO] Parsing packages for working directory
+[INFO] Determining queries to execute
+[INFO] Advanced SAST analysis completed!
+[INFO] SAST analysis completed!
+[INFO] Analysis finished, writing results
+[INFO] 063. Lack of data validation - Path Traversal
+The application has functionality vulnerable to path traversal in my-dir/website/admin/index.php
+
+  1 | <?php
+  2 |
+  3 | $page = $_GET['page'] . '.php';
+> 4 | require_once($page);
+  5 |
+  6 | ?>
+    ^ Col 0
+CWE-22 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-063
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/php.ini
+
+   471 | ; Possible Values:
+   472 | ;   Off = Do not display any errors
+   473 | ;   stderr = Display errors to STDERR (affects only CGI/CLI binaries!)
+   474 | ;   On or stdout = Display errors to STDOUT
+   475 | ; Default Value: On
+   476 | ; Development Value: On
+   477 | ; Production Value: Off
+   478 | ; http://php.net/display-errors
+>  479 | display_errors = On
+   480 |
+   481 | ; The display of errors which occur during PHP's startup sequence are handled
+   482 | ; separately from display_errors. PHP's default behavior is to suppress those
+   483 | ; errors from clients. Turning the display of startup errors on can be useful in
+   484 | ; debugging configuration problems. But, it's strongly recommended that you
+   485 | ; leave this setting off on production servers.
+   486 | ; Default Value: Off
+   487 | ; Development Value: On
+       ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/pictures/search.php
+
+  13 | }
+  14 |
+  15 | $pictures = Pictures::get_all_pictures_by_tag($_GET['query']);
+  16 |
+  17 | ?>
+  18 |
+  19 | <?php our_header("", $_GET['query']); ?>
+  20 |
+  21 | <div class="column prepend-1 span-24 first last">
+> 22 | <h2>Pictures that are tagged as '<?= $_GET['query']  ?>'</h2>
+  23 |
+  24 |    <?php thumbnail_pic_list($pictures); ?>
+  25 |
+  26 | </div>
+  27 |
+  28 |
+  29 | <?php our_footer(); ?>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/website/include/users.php
+
+   85 | function check_login($username, $pass, $vuln = False)
+   86 |    {
+   87 |       if ($vuln)
+   88 |       {
+   89 |   $query = sprintf("SELECT * from `users` where `login` like '%s' and `password` = SHA1( CONCAT('%s', `salt`)) limit 1;",
+   90 |                     $username,
+   91 |                     mysql_real_escape_string($pass));
+   92 |       }
+   93 |       else
+   94 |       {
+   95 |   $query = sprintf("SELECT * from `users` where `login` like '%s' and `password` = SHA1( CONCAT('%s', `salt`)) limit 1;",
+   96 |                     mysql_real_escape_string($username),
+   97 |                     mysql_real_escape_string($pass));
+   98 |       }
+   99 |       $res = mysql_query($query);
+  100 |       if ($res)
+  101 |       {
+  102 |   return mysql_fetch_assoc($res);
+  103 |       }
+  104 |       else
+  105 |       {
+  106 |   if ($vuln)
+  107 |   {
+> 108 |      die(mysql_error());
+  109 |   }
+  110 |   else
+  111 |   {
+  112 |      return False;
+  113 |   }
+  114 |       }
+  115 |    }
+      ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 418. Insecure service configuration - Docker
+Using the ADD command to automatically extract files to the destination directory adds the risk of Zip Bombs and Zip Slip attacks in my-dir/Dockerfile
+
+   1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+   7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+  10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+  11 | ADD php.ini /etc/php5/apache2/php.ini
+> 12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-829 - CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:L/AC:H/PR:L/AT:N/UI:N/SC:N/SI:N/SA:N/VC:N/VI:L/VA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-418
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/website/include/users.php
+
+  30 | function create_user($username, $pass, $firstname, $lastname, $vuln = False)
+  31 |    {
+  32 |       $salt = mt_rand(0, 900);
+  33 |       $salt = base64_encode($salt);
+  34 |       $initial_bux = 100;
+  35 |       if ($vuln)
+  36 |       {
+  37 |   $pass = mysql_real_escape_string($pass);
+  38 |   $firstname = mysql_real_escape_string($firstname);
+  39 |   $pass = $pass . $salt;
+  40 |   $query = "INSERT INTO `users` (`id`, `login`, `password`, `firstname`, `lastname`, `salt`, `tradebux`, `created_on`, `l
+  41 |       }
+  42 |       else
+  43 |       {
+  44 |   $query = sprintf("INSERT INTO `users` (`id`, `login`, `password`, `firstname`, `lastname`, `salt`, `tradebux`, `created
+  45 |      mysql_real_escape_string($username),
+  46 |      mysql_real_escape_string($pass . $salt),
+  47 |      mysql_real_escape_string($firstname),
+  48 |                    mysql_real_escape_string($lastname),
+  49 |      mysql_real_escape_string($salt),
+  50 |      mysql_real_escape_string($initial_bux));
+  51 |
+  52 |       }
+  53 |       if ($res = mysql_query($query))
+  54 |       {
+  55 |   return mysql_insert_id();
+  56 |       }
+  57 |       else
+  58 |       {
+  59 |   if ($vuln)
+  60 |   {
+> 61 |      die(mysql_error());
+  62 |   }
+  63 |   else
+  64 |   {
+  65 |      return False;
+  66 |   }
+  67 |       }
+  68 |
+  69 |    }
+     ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 418. Insecure service configuration - Docker
+Using the ADD command to automatically extract files to the destination directory adds the risk of Zip Bombs and Zip Slip attacks in my-dir/Dockerfile
+
+   1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+   7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+  10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+> 11 | ADD php.ini /etc/php5/apache2/php.ini
+  12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-829 - CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:L/AC:H/PR:L/AT:N/UI:N/SC:N/SI:N/SA:N/VC:N/VI:L/VA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-418
+
+[INFO] 004. Remote command execution
+The system executes commands composed with inputs from external sources without proper validation in my-dir/website/users/check_pass.php
+
+   3 |
+   4 | if (!isset($_GET["password"])) // ?password=blah
+   5 | {
+   6 |    error_404();
+   7 | }
+   8 | $pass = $_GET["password"];
+   9 |
+  10 |
+> 11 | exec("/bin/cat /usr/share/dict/words | grep " . $pass, $output, $status);
+  12 |
+  13 | if ($status == 0)
+  14 | {
+  15 |    $strong = False;
+  16 | }
+  17 | else
+  18 | {
+  19 |    $string = True;
+     ^ Col 0
+CWE-78 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H/E:U/RL:T/RC:R - CVSS:4.0/AV:N/AC:L/PR:N/UI:N/AT:N/VC:H/VI:H/VA:H/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-004
+
+[INFO] 380. Supply Chain Attack - Docker
+Docker dependencies are not pinned to an exact digest in my-dir/Dockerfile
+
+>  1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+   7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+  10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+  11 | ADD php.ini /etc/php5/apache2/php.ini
+  12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-494 - CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-380
+
+[INFO] 004. Remote command execution
+The system executes commands composed with inputs from external sources without proper validation in my-dir/website/passcheck.php
+
+   3 | require_once("include/html_functions.php");
+   4 | $checked = false;
+   5 | $ret = 0;
+   6 | if (isset($_POST['password']))
+   7 | {
+   8 |    // check the password strength
+   9 |    $pass = $_POST['password'];
+  10 |    $command = "grep ^$pass$ /etc/dictionaries-common/words";
+> 11 |    exec($command, $output, $ret);
+  12 |    $checked = true;
+  13 | }
+  14 |
+  15 | ?>
+  16 |
+  17 | <?php our_header("home"); ?>
+  18 |
+  19 |
+     ^ Col 0
+CWE-78 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H/E:U/RL:T/RC:R - CVSS:4.0/AV:N/AC:L/PR:N/UI:N/AT:N/VC:H/VI:H/VA:H/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-004
+
+[INFO] 078. Insecurely generated token
+It is possible to crack the token's hash and obtain the information it is masking because it is not generated using a secure cryptographic mechanism in my-dir/website/include/admins.php
+
+  57 | function login_admin($adminid)
+  58 |    {
+  59 |       // Don't trust the php session, we're using our own
+  60 |       $query = sprintf("INSERT into `admin_session` (`id`, `admin_id`, `created_on`) VALUES (NULL, '%s', NOW());",
+  61 |          mysql_real_escape_string($adminid));
+  62 |       if ($res = mysql_query($query))
+  63 |       {
+  64 |   // add the cookie
+  65 |   $id = mysql_insert_id();
+> 66 |   setcookie("session", $id);
+  67 |   return mysql_insert_id();
+  68 |       }
+  69 |       else
+  70 |       {
+  71 |   return False;
+  72 |       }
+  73 |    }
+     ^ Col 0
+CWE-1270 - CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RL:O/RC:R - CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-078
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/submitname.php
+
+   7 | if (!isset($_GET['value']))
+   8 | {
+   9 |    http_redirect(Users::$HOME_URL);
+  10 | }
+  11 |
+  12 |
+  13 | ?>
+  14 |
+  15 | <?php our_header("home"); ?>
+  16 |
+  17 | <div class="column prepend-1 span-24 first last">
+  18 |   <p>
+> 19 |     Your favorite color is <?= $_GET['value'] ?>! and you've been entered in our contest!
+  20 |   </p>
+  21 | </div>
+  22 |
+  23 | <?php our_footer(); ?>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 262. Insecure encryption algorithm - SHA1
+The server where the application is stored supports insecure ciphers - SHA1 in my-dir/website/include/users.php
+
+  117 | function similar_login($login, $vuln = False)
+  118 |    {
+  119 |       if ($vuln)
+  120 |       {
+  121 |   $query = "SELECT * from `users` where `firstname` like '%{$login}%' and firstname != '{$login}'";
+  122 |       }
+  123 |       else
+  124 |       {
+  125 |   $query = sprintf("SELECT * from `users` where `firstname` like '%%%s%%' and firstname != '%s'",
+  126 |      mysql_real_escape_string($login),
+  127 |      mysql_real_escape_string($login));
+  128 |       }
+> 129 |       $res = mysql_query($query);
+  130 |       if ($res)
+  131 |       {
+  132 |   while ($row = mysql_fetch_assoc($res))
+  133 |   {
+  134 |      $to_ret[] = $row;
+  135 |   }
+  136 |   return $to_ret;
+  137 |
+  138 |       }
+  139 |       else
+  140 |       {
+  141 |   if ($vuln)
+  142 |   {
+  143 |      die(mysql_error());
+  144 |   }
+  145 |   return False;
+  146 |       }
+  147 |
+  148 |
+  149 |    }
+      ^ Col 0
+CWE-328 - CVSS:3.1/AV:A/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N/E:P/RL:O/RC:C - CVSS:4.0/AV:A/AC:H/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-262
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/test.php
+
+   2 | $head = $_GET['head'];
+   3 | $title = $_GET['title'];
+   4 | $href = $_GET['href'];
+   5 | $script = $_GET['script'];
+   6 | ?>
+   7 | <html>
+   8 |    <head><?php echo $head; ?> <title><?php echo $title; ?></title></head>
+   9 |    <body>
+> 10 |       <a href="http://<?php echo $href; ?>">text</a>
+  11 |    <script>
+  12 |       <?php echo $script; ?>
+  13 |    </script>
+  14 | <frameset>
+  15 |
+  16 | </frameset>
+  17 | </body>
+  18 | </html>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 262. Insecure encryption algorithm - SHA1
+The server where the application is stored supports insecure ciphers - SHA1 in my-dir/website/include/admins.php
+
+  79 | function check_login($admin, $pass)
+  80 |    {
+  81 |       $query = sprintf("SELECT * from `admin` where `login` like '%s' and `password` = SHA1( '%s' ) limit 1;",
+  82 |          mysql_real_escape_string($admin),
+  83 |          mysql_real_escape_string($pass));
+> 84 |       $res = mysql_query($query);
+  85 |       if ($res)
+  86 |       {
+  87 |   return mysql_fetch_assoc($res);
+  88 |       }
+  89 |       else
+  90 |       {
+  91 |   return False;
+  92 |       }
+  93 |    }
+     ^ Col 0
+CWE-328 - CVSS:3.1/AV:A/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N/E:P/RL:O/RC:C - CVSS:4.0/AV:A/AC:H/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-262
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/website/include/users.php
+
+  117 | function similar_login($login, $vuln = False)
+  118 |    {
+  119 |       if ($vuln)
+  120 |       {
+  121 |   $query = "SELECT * from `users` where `firstname` like '%{$login}%' and firstname != '{$login}'";
+  122 |       }
+  123 |       else
+  124 |       {
+  125 |   $query = sprintf("SELECT * from `users` where `firstname` like '%%%s%%' and firstname != '%s'",
+  126 |      mysql_real_escape_string($login),
+  127 |      mysql_real_escape_string($login));
+  128 |       }
+  129 |       $res = mysql_query($query);
+  130 |       if ($res)
+  131 |       {
+  132 |   while ($row = mysql_fetch_assoc($res))
+  133 |   {
+  134 |      $to_ret[] = $row;
+  135 |   }
+  136 |   return $to_ret;
+  137 |
+  138 |       }
+  139 |       else
+  140 |       {
+  141 |   if ($vuln)
+  142 |   {
+> 143 |      die(mysql_error());
+  144 |   }
+  145 |   return False;
+  146 |       }
+  147 |
+  148 |
+  149 |    }
+      ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 362. Technical information leak - Content response
+It is possible to obtain technical information from the application in my-dir/website/include/test.php
+
+  1 | <?php
+  2 | require_once("users.php");
+> 3 | phpinfo();
+  4 | $res = Users::get_user(3);
+  5 | print_r($res);
+  6 | ?>
+    ^ Col 0
+CWE-497 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-362
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/test.php
+
+   2 | $head = $_GET['head'];
+   3 | $title = $_GET['title'];
+   4 | $href = $_GET['href'];
+   5 | $script = $_GET['script'];
+   6 | ?>
+   7 | <html>
+   8 |    <head><?php echo $head; ?> <title><?php echo $title; ?></title></head>
+   9 |    <body>
+  10 |       <a href="http://<?php echo $href; ?>">text</a>
+  11 |    <script>
+> 12 |       <?php echo $script; ?>
+  13 |    </script>
+  14 | <frameset>
+  15 |
+  16 | </frameset>
+  17 | </body>
+  18 | </html>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 405. Excessive privileges - Access Mode
+The system files or directories have overly permissive access modes in my-dir/Dockerfile
+
+   1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+>  7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+  10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+  11 | ADD php.ini /etc/php5/apache2/php.ini
+  12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-732 - CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L/E:P/RL:O/RC:C - CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-405
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/website/include/pictures.php
+
+  51 | function get_some_pictures_by_tag($tag, $not_this, $limit)
+  52 |    {
+  53 |       $query = sprintf("SELECT pictures.filename, pictures.id, pictures.user_id, users.login from pictures, users where p
+  54 |          mysql_real_escape_string($not_this),
+  55 |          mysql_real_escape_string($tag),
+  56 |          mysql_real_escape_string($limit));
+> 57 |       $res = mysql_query($query) or die(mysql_error());
+  58 |       if ($res)
+  59 |       {
+  60 |   while ($row = mysql_fetch_assoc($res))
+  61 |   {
+  62 |      $to_ret[] = $row;
+  63 |   }
+  64 |   return $to_ret;
+  65 |       }
+  66 |       else
+  67 |       {
+  68 |   return False;
+  69 |       }
+  70 |    }
+     ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 418. Insecure service configuration - Docker
+Using the ADD command to automatically extract files to the destination directory adds the risk of Zip Bombs and Zip Slip attacks in my-dir/Dockerfile
+
+   1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+   7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+> 10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+  11 | ADD php.ini /etc/php5/apache2/php.ini
+  12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-829 - CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:L/AC:H/PR:L/AT:N/UI:N/SC:N/SI:N/SA:N/VC:N/VI:L/VA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-418
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/piccheck.php
+
+  11 | $type = $_FILES['userfile']['type'];
+  12 | $name = $_POST['name'];
+  13 |
+  14 | ?>
+  15 |
+  16 | <?php our_header("home"); ?>
+  17 |
+  18 |
+  19 | <div class="column prepend-1 span-24 first last">
+> 20 |   <h2>Checking your file <?= $name ?></h2>
+  21 |   <p>
+  22 |     File is O.K. to upload!
+  23 |   </p>
+  24 | </div>
+  25 |
+  26 |
+  27 | <?php our_footer(); ?>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 405. Excessive privileges - Access Mode
+The system files or directories have overly permissive access modes in my-dir/website/pictures/upload.php
+
+  19 |    }
+  20 |    else
+  21 |    {
+  22 |       $_POST['name'] = str_replace("..", "", $_POST['name']);
+  23 |       $_POST['name'] = str_replace(" ", "", $_POST['name']);
+  24 |       $_POST['name'] = str_replace("/", "", $_POST['name']);
+  25 |       if (!file_exists("../upload/{$_POST['tag']}/"))
+  26 |       {
+> 27 |   mkdir("../upload/{$_POST['tag']}", 0777, True);
+  28 |       }
+  29 |       $filename = "../upload/{$_POST['tag']}/{$_POST['name']}";
+  30 |       $relfilename = "{$_POST['tag']}/{$_POST['name']}";
+  31 |       if ($_POST['price'] < 0)
+  32 |       {
+  33 |   $_POST['price'] = abs($_POST['price']);
+  34 |       }
+  35 |       if (file_exists($filename))
+     ^ Col 0
+CWE-732 - CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L/E:P/RL:O/RC:C - CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-405
+
+[INFO] 239. Technical information leak - Errors
+The display of error messages is allowed, which may reveal technical information in my-dir/website/guestbook.php
+
+   9 |    {
+  10 |       $flash['error'] = "Must include both the name and comment field!";
+  11 |    }
+  12 |    else
+  13 |    {
+  14 |       $res = Guestbook::add_guestbook($_POST["name"], $_POST["comment"], False);
+  15 |       if (!$res)
+  16 |       {
+> 17 |   die(mysql_error());
+  18 |       }
+  19 |    }
+  20 | }
+  21 |
+  22 | $guestbook = Guestbook::get_all_guestbooks();
+  23 | ?>
+  24 |
+  25 | <?php our_header("guestbook"); ?>
+     ^ Col 0
+CWE-209 - CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-239
+
+[INFO] 262. Insecure encryption algorithm - SHA1
+The server where the application is stored supports insecure ciphers - SHA1 in my-dir/website/include/users.php
+
+   85 | function check_login($username, $pass, $vuln = False)
+   86 |    {
+   87 |       if ($vuln)
+   88 |       {
+   89 |   $query = sprintf("SELECT * from `users` where `login` like '%s' and `password` = SHA1( CONCAT('%s', `salt`)) limit 1;",
+   90 |                     $username,
+   91 |                     mysql_real_escape_string($pass));
+   92 |       }
+   93 |       else
+   94 |       {
+   95 |   $query = sprintf("SELECT * from `users` where `login` like '%s' and `password` = SHA1( CONCAT('%s', `salt`)) limit 1;",
+   96 |                     mysql_real_escape_string($username),
+   97 |                     mysql_real_escape_string($pass));
+   98 |       }
+>  99 |       $res = mysql_query($query);
+  100 |       if ($res)
+  101 |       {
+  102 |   return mysql_fetch_assoc($res);
+  103 |       }
+  104 |       else
+  105 |       {
+  106 |   if ($vuln)
+  107 |   {
+  108 |      die(mysql_error());
+  109 |   }
+  110 |   else
+  111 |   {
+  112 |      return False;
+  113 |   }
+  114 |       }
+  115 |    }
+      ^ Col 0
+CWE-328 - CVSS:3.1/AV:A/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N/E:P/RL:O/RC:C - CVSS:4.0/AV:A/AC:H/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-262
+
+[INFO] 068. Insecure session expiration time
+User sessions do not expire after 5 minutes of inactivity in my-dir/php.ini
+
+  1382 | session.name = PHPSESSID
+  1383 |
+  1384 | ; Initialize session on request startup.
+  1385 | ; http://php.net/session.auto-start
+  1386 | session.auto_start = 0
+  1387 |
+  1388 | ; Lifetime in seconds of cookie or, if 0, until browser is restarted.
+  1389 | ; http://php.net/session.cookie-lifetime
+> 1390 | session.cookie_lifetime = 0
+  1391 |
+  1392 | ; The path for which the cookie is valid.
+  1393 | ; http://php.net/session.cookie-path
+  1394 | session.cookie_path = /
+  1395 |
+  1396 | ; The domain for which the cookie is valid.
+  1397 | ; http://php.net/session.cookie-domain
+  1398 | session.cookie_domain =
+       ^ Col 0
+CWE-613 - CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-068
+
+[INFO] 266. Excessive Privileges - Docker
+No command found to create a group or user, make sure the container is running as non-root in my-dir/Dockerfile
+
+>  1 | FROM tutum/lamp
+   2 | MAINTAINER Adam Doupe <adamdoupe@gmail.com>
+   3 |
+   4 | RUN apt-get update && apt-get install -y libgd-dev php5-gd
+   5 | RUN rm -fr /app
+   6 | COPY website /app
+   7 | RUN chmod 777 /app/upload
+   8 |
+   9 | COPY current.sql .
+  10 | ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+  11 | ADD php.ini /etc/php5/apache2/php.ini
+  12 | ADD php.ini /etc/php5/cli/php.ini
+  13 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_worker.conf
+  14 | RUN sed -i 's/150/250/g' /etc/apache2/mods-available/mpm_prefork.conf
+  15 | RUN chmod 755 /*.sh
+     ^ Col 0
+CWE-250 - CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L/E:U/RL:O/RC:C - CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-266
+
+[INFO] 128. Insecurely generated cookies - HttpOnly
+The HttpOnly flag is not set for the session cookie in my-dir/php.ini
+
+  1394 | session.cookie_path = /
+  1395 |
+  1396 | ; The domain for which the cookie is valid.
+  1397 | ; http://php.net/session.cookie-domain
+  1398 | session.cookie_domain =
+  1399 |
+  1400 | ; Whether or not to add the httpOnly flag to the cookie, which makes it inaccessible to browser scripting languages such
+  1401 | ; http://php.net/session.cookie-httponly
+> 1402 | session.cookie_httponly =
+  1403 |
+  1404 | ; Handler used to serialize data.  php is the standard serializer of PHP.
+  1405 | ; http://php.net/session.serialize-handler
+  1406 | session.serialize_handler = php
+  1407 |
+  1408 | ; Defines the probability that the 'garbage collection' process is started
+  1409 | ; on every session initialization. The probability is calculated by using
+  1410 | ; gc_probability/gc_divisor. Where session.gc_probability is the numerator
+       ^ Col 0
+CWE-1004 - CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N/E:P/RL:O/RC:C - CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-128
+
+[INFO] 063. Lack of data validation - Path Traversal
+The application has functionality vulnerable to path traversal in my-dir/website/pictures/upload.php
+
+  19 |    }
+  20 |    else
+  21 |    {
+  22 |       $_POST['name'] = str_replace("..", "", $_POST['name']);
+  23 |       $_POST['name'] = str_replace(" ", "", $_POST['name']);
+  24 |       $_POST['name'] = str_replace("/", "", $_POST['name']);
+  25 |       if (!file_exists("../upload/{$_POST['tag']}/"))
+  26 |       {
+> 27 |   mkdir("../upload/{$_POST['tag']}", 0777, True);
+  28 |       }
+  29 |       $filename = "../upload/{$_POST['tag']}/{$_POST['name']}";
+  30 |       $relfilename = "{$_POST['tag']}/{$_POST['name']}";
+  31 |       if ($_POST['price'] < 0)
+  32 |       {
+  33 |   $_POST['price'] = abs($_POST['price']);
+  34 |       }
+  35 |       if (file_exists($filename))
+     ^ Col 0
+CWE-22 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-063
+
+[INFO] 235. Technical information leak - Headers
+Ensure that the expose_php directive is not enabled in my-dir/php.ini
+
+   368 | ; Miscellaneous ;
+   369 | ;;;;;;;;;;;;;;;;;
+   370 |
+   371 | ; Decides whether PHP may expose the fact that it is installed on the server
+   372 | ; (e.g. by adding its signature to the Web server header).  It is no security
+   373 | ; threat in any way, but it makes it possible to determine whether you use PHP
+   374 | ; on your server or not.
+   375 | ; http://php.net/expose-php
+>  376 | expose_php = On
+   377 |
+   378 | ;;;;;;;;;;;;;;;;;;;
+   379 | ; Resource Limits ;
+   380 | ;;;;;;;;;;;;;;;;;;;
+   381 |
+   382 | ; Maximum execution time of each script, in seconds
+   383 | ; http://php.net/max-execution-time
+   384 | ; Note: This directive is hardcoded to 0 for the CLI SAPI
+       ^ Col 0
+CWE-497 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:P/RL:U/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-235
+
+[INFO] 008. Reflected cross-site scripting (XSS)
+The web application dynamically generates web content without validating the source of the potentially untrusted data in my-dir/website/test.php
+
+   1 | <?php
+   2 | $head = $_GET['head'];
+   3 | $title = $_GET['title'];
+   4 | $href = $_GET['href'];
+   5 | $script = $_GET['script'];
+   6 | ?>
+   7 | <html>
+>  8 |    <head><?php echo $head; ?> <title><?php echo $title; ?></title></head>
+   9 |    <body>
+  10 |       <a href="http://<?php echo $href; ?>">text</a>
+  11 |    <script>
+  12 |       <?php echo $script; ?>
+  13 |    </script>
+  14 | <frameset>
+  15 |
+  16 | </frameset>
+  17 | </body>
+     ^ Col 0
+CWE-79 - CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:L/VA:L/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-008
+
+[INFO] 063. Lack of data validation - Path Traversal
+The application has functionality vulnerable to path traversal in my-dir/website/pictures/upload.php
+
+  36 |       {
+  37 |   $new_name = tempnam("../upload", $filename);
+  38 |   move_uploaded_file($_FILES['pic']['tmp_name'], $new_name);
+  39 |   $id = Pictures::add_conflict($filename, $new_name, $_POST['tag'], $_POST['title'], $_POST['price'], $user['id']);
+  40 |   http_redirect(Pictures::$CONFLICT_URL . "?conflictid={$id}");
+  41 |       }
+  42 |       else
+  43 |       {
+> 44 |   if (move_uploaded_file($_FILES['pic']['tmp_name'], $filename))
+  45 |   {
+  46 |
+  47 |      if ($id = Pictures::create_picture($_POST['title'], 128, 128, $_POST['tag'], $relfilename, $_POST['price'], $user['i
+  48 |      {
+  49 |         $main = ".550.jpg";
+  50 |         $side = ".128.jpg";
+  51 |         $thumb= ".128_128.jpg";
+  52 |         Pictures::resize_image($filename, $filename . $main, 550, 10000000);
+     ^ Col 0
+CWE-22 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RL:O/RC:C - CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-063
+
+[INFO] 004. Remote command execution
+The system executes commands composed with inputs from external sources without proper validation in my-dir/website/pictures/high_quality.php
+
+  14 |    error_404();
+  15 | }
+  16 |
+  17 | $user = Users::current_user();
+  18 | $pic = Pictures::get_picture($_GET['picid']);
+  19 |
+  20 | if ($_GET['key'] != $pic['high_quality'])
+  21 | {
+  22 |    error_404();
+  23 | }
+  24 |
+  25 | $filepath = "../upload/" . $pic['filename'];
+  26 |
+  27 | header("Content-type: " . mime_content_type($filepath));
+> 28 | passthru("cat $filepath");
+  29 |
+  30 | ?>
+     ^ Col 0
+CWE-78 - CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H/E:U/RL:T/RC:R - CVSS:4.0/AV:N/AC:L/PR:N/UI:N/AT:N/VC:H/VI:H/VA:H/SC:L/SI:L/SA:L/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-004
+
+[INFO] 437. Supply Chain Attack - GitHub Actions
+The GitHub actions don't have their actions locked to a specific revision in my-dir/.github/workflows/dev.yml
+
+   6 | runs-on: ubuntu-latest
+   7 |     steps:
+   8 |       - name: Checkout repository
+>  9 |         uses: actions/checkout@v4
+  10 |
+  11 |       - name: Run Fluid Attacks Skims
+  12 |         run: |
+  13 |           docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims --strict scan /my-dir > skim
+  14 |       - name: Commit skims-output.txt
+  15 |         run: |
+  16 |           git config --global user.name "github-actions[bot]"
+  17 |           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+  18 |
+  19 |           git add skims-output.txt
+  20 |           git commit -m "chore: update skims-output.txt [skip ci]" || echo "No changes to commit"
+  21 |           git push
+     ^ Col 0
+CWE-829 - CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:L/A:N/E:U/RL:O/RC:R - CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+Report found by SAST module.
+More information in: https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-437
+
+[INFO] Scan finished at 2025-05-31 15:29:56 (UTC+00:00). Duration:  06 sec.
+[INFO] Summary: 34 vulnerabilities were found in your targets.
