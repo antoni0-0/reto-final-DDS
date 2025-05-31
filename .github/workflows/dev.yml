@@ -11,3 +11,9 @@ jobs:
       - name: Run Fluid Attacks Skims
         run: |
           docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims --strict scan /my-dir
+          
+      - name: Upload Skims output
+        uses: actions/upload-artifact@v4
+        with:
+          name: skims-report
+          path: skims-output.txt
