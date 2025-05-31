@@ -1,6 +1,7 @@
 version: "1"
 scan:
-  path: ${{ github.workspace }}:/my-dir
+  path: /my-dir
   strict: true
   output:
     file: /my-dir/skims-output.txt
+  
