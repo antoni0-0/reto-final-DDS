@@ -10,4 +10,4 @@ jobs:
 
       - name: Run Fluid Attacks Skims
         run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan /my-dir/config.yaml
+          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan ./config.yaml
