@@ -7,7 +7,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
-      - name: Run Fluid Attacks Skims
+      - name: Run Fluid Attacks Skims with config file
         run: |
-          docker run --rm -v ${{ github.workspace }}:/my-dir fluidattacks/skims:latest skims scan /my-dir/config.yaml
+          docker run --rm -v "${{ github.workspace }}:/my-dir" \
+            fluidattacks/skims:latest skims scan config.yaml
+        working-directory: ${{ github.workspace }}
+
+      - name: Commit and push CSV report
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -f Fluid-Attacks-Results.csv ]; then
+            git add Fluid-Attacks-Results.csv
+            git commit -m "chore: add Fluid-Attacks-Results.csv [skip ci]" || echo "No changes to commit"
+            git push
+          else
+            echo "No report generated."
+          fi
