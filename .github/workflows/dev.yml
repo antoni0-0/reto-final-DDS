@@ -8,13 +8,13 @@ jobs:
       - name: Run Fluid Attacks Skims
         uses: docker://docker.io/fluidattacks/skims:latest
         with:
-          args: skims  scan ${PWD}
-      # - name: Upload security scan results
-      #   uses: actions/upload-artifact@v4
-      #   if: always()
-      #   with:
-      #     name: security-scan-results-csv
-      #     path: |
-      #       Fluid-Attacks-Results.csv
-      #       **/*.csv
-      #     retention-days: 30
+          args: skims  scan config.yaml
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results-csv
+          path: |
+            Fluid-Attacks-Results.csv
+            **/*.csv
+          retention-days: 30
