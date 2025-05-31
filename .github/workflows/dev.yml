@@ -16,4 +16,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: skims-report
-          path: skims-output.txt
+          path: ./skims-output.txt
